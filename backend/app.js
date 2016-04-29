@@ -6,6 +6,9 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var passport = require('passport');
 var session = require('express-session');
+var mongoose = require('mongoose');
+
+mongoose.connect('mongodb://localhost:27017/chirp-test');
 
 var api = require('./routes/api');
 var auth = require('./routes/auth')(passport);
@@ -30,6 +33,8 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(passport.initialize());
 app.use(passport.session());
+
+var models = require('./models/models');
 
 var initializePassport = require('./passport');
 initializePassport(passport);

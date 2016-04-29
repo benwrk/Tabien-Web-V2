@@ -1,7 +1,10 @@
 // Passport initialization JS.
 var LocalStrategy = require('passport-local').Strategy;
 var bcrypt = require('bcrypt-nodejs');
-var users = {};
+var mongoose = require('mongoose');
+
+var User = mongoose.model('User');
+var Post = mongoose.model('Post');
 
 module.exports = function (passport) {
     passport.serializeUser(function (user, done) {
