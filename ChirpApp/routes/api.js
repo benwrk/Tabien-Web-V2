@@ -23,9 +23,10 @@ router.use(function (req, res, next) {
 router.route('/posts').get(function (req, res) {
     Post.find(function (err, data) {
         if (err) {
-            console.log('[api.js] GET /posts - Error getting posts!');
+            // console.log('[api.js] GET /posts - Error getting posts!');
             return res.status(500).send(err);
         }
+        console.log('[api.js] Response: all posts');
         return res.send(data);
     });
 }).post(function (req, res) {
