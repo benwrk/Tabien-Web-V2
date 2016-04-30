@@ -13,7 +13,7 @@ router.use(function (req, res, next) {
 
     if (!req.isAuthenticated()) {
         // console.log('[api.js] \'' + req.ip + '\' is not logged in, redirecting...');
-        return res.redirect('/#login');
+        return res.redirect('/login');
     }
 
     // console.log('[api.js] \'' + req.ip + '\' is authenticated, proceeding...');

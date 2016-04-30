@@ -1,3 +1,11 @@
+console.log('[app.js] Starting application...');
+console.log('[app.js] Current server time: ' + new Date().toString());
+
+process.env.PORT = process.env.PORT || 80;
+console.log('[app.js] Listening port: ' + process.env.PORT);
+
+// Require JS imports
+console.log('[app.js] Importing modules...');
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
@@ -15,9 +23,11 @@ mongoose.connect(mongoDBHost);
 console.log('[app.js] Importing Mongoose Model schemas...');
 var models = require('./models/models');
 
+// ExpressJS routings
 console.log('[app.js] Importing custom Express routers...');
 var api = require('./routes/api');
 var auth = require('./routes/auth')(passport);
+var index = require('./routes/index');
 
 var app = express();
 
@@ -40,11 +50,15 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(passport.initialize());
 app.use(passport.session());
 
-console.log('[app.js] Initializing Passport.js configuration module...');
-var initializePassport = require('./passport');
+// Make node_modules accessible to the public.
+app.use('/node_modules', express.static(path.join(__dirname, '/node_modules')));
+
+console.log('[app.js] Importing Passport.js configuration module...');
+var initializePassport = require('./config/passport');
 initializePassport(passport);
 
 console.log('[app.js] Configuring routing...');
+app.use('/', index);
 app.use('/api', api);
 app.use('/auth', auth);
 

@@ -1,6 +1,19 @@
 "use_strict";
 
-var app = angular.module('chirpApp', []);
+var app = angular.module('chirpApp', ['ngRoute']);
+
+app.config(function ($routeProvider) {
+    $routeProvider.when('/', {
+        templateUrl: 'main.html',
+        controller: 'chirpController'
+    }).when('/login', {
+        templateUrl: 'login.html',
+        controller: 'authController'
+    }).when('/signup', {
+        templateUrl: 'signup.html',
+        controller: 'authController'
+    });
+});
 
 app.controller('chirpController', function ($scope) {
     $scope.posts = [];
