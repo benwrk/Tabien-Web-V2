@@ -1,17 +1,16 @@
-// Passport initialization JS.
-var LocalStrategy = require('passport-local').Strategy;
-var bcrypt = require('bcrypt-nodejs');
-var mongoose = require('mongoose');
-
+var mongoose = require('mongoose');   
 var User = mongoose.model('User');
-var Post = mongoose.model('Post');
+var LocalStrategy   = require('passport-local').Strategy;
+var bCrypt = require('bcrypt-nodejs');
 
-module.exports = function (passport) {
+module.exports = function(passport){
+
+	// Passport needs to be able to serialize and deserialize users to support persistent login sessions
     passport.serializeUser(function (user, done) {
         console.log('[passport.js] Serializing user: ', user.username);
         return done(null, user._id);
     });
-
+    
     passport.deserializeUser(function (id, done) {
         User.findById(id, function (err, user) {
             if (err) {
@@ -22,11 +21,11 @@ module.exports = function (passport) {
                 return done('User not found', false);
             }
 
-            return done(user, true);
+            return done(null, user);
         });
     });
 
-    passport.use('login', new LocalStrategy({
+	passport.use('login', new LocalStrategy({
         passReqToCallback: true
     }, function (req, username, password, done) {
 
@@ -87,12 +86,14 @@ module.exports = function (passport) {
             });
         });
     }));
+	
+	var isValidPassword = function(user, password){
+		return bCrypt.compareSync(password, user.password);
+	};
+	// Generates hash using bCrypt
+	var createHash = function(password){
+		return bCrypt.hashSync(password, bCrypt.genSaltSync(10), null);
+	};
 
-    var isValidPassword = function (user, password) {
-        return bcrypt.compareSync(password, user.password);
-    };
-
-    var createHash = function (password) {
-        return bcrypt.hashSync(password, bcrypt.genSaltSync(10), null);
-    };
 };
+
