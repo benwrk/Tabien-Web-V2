@@ -8,44 +8,84 @@ var Post = mongoose.model('Post');
 
 module.exports = function (passport) {
     passport.serializeUser(function (user, done) {
-        // Tell passport which id to use for user
         console.log('[passport.js] Serializing user: ', user.username);
-        return done(null, user.username);
+        return done(null, user._id);
     });
 
-    passport.deserializeUser(function (username, done) {
-        return done(null, users[username]);
+    passport.deserializeUser(function (id, done) {
+        User.findById(id, function (err, user) {
+            if (err) {
+                return done(err, false);
+            }
+
+            if (!user) {
+                return done('User not found', false);
+            }
+
+            return done(user, true);
+        });
     });
 
     passport.use('login', new LocalStrategy({
         passReqToCallback: true
     }, function (req, username, password, done) {
-        if (!users[username]) {
-            return done('illegal username', false);
-        }
-        if (!isValidPassword(users[username], password)) {
-            return done('invalid password', false);
-        }
-        // Successfully logged in
-        console.log('[passport.js] User: ' + username + ' successfully logged in');
-        return done(null, users[username]);
+
+        User.findOne({
+            'username': username
+        }, function (err, user) {
+            if (err) {
+                console.log('[passport.js] Error in database connection while logging in \'' + username + '\':');
+                console.log(err);
+                return done(err, false);
+            }
+
+            if (!user) {
+                console.log('[passport.js] login - User \'' + username + '\' does not exist in the database');
+                return done('User ' + username + ' not found', false);
+            }
+
+            if (!isValidPassword(user, password)) {
+                console.log('[passport.js] login - Password for \'' + username + '\' does not match what\'s in the database');
+                return done('Invalid password for user ' + username, false);
+            }
+            
+            console.log('[passport.js] Successfully logged in: ' + username);
+            return done(null, user);
+        });
     }));
 
     passport.use('signup', new LocalStrategy({
         passReqToCallback: true
     }, function (req, username, password, done) {
         // Check if user already exists
-        if (users[username]) {
-            return done('username already exists', false);
-        }
+        User.findOne({
+            'username': username
+        }, function (err, user) {
+            if (err) {
+                console.log('[passport.js] Error in database connection when signing up for: ' + username);
+                console.log(err);
+                return done(err, false);
+            }
 
-        // Add user to database
-        users[username] = {
-            username: username,
-            password: createHash(password)
-        };
+            if (user) {
+                console.log('[passport.js] Attempt to signup \'' + username + '\' failed: Username already exists.');
+                return done('username already exists', false);
+            }
+            
+             // Add user to database
+            var newUser = new User();
+            newUser.username = username;
+            newUser.password = createHash(password);
 
-        return done(null, users[username]);
+            newUser.save(function (err, user) {
+                if (err) {
+                    console.log('[passport.js] Error in saving new user: ' + username);
+                    return done(err, false);
+                }
+                console.log('[passport.js] Successfully signed up: ' + username);
+                return done(null, user);
+            });
+        });
     }));
 
     var isValidPassword = function (user, password) {

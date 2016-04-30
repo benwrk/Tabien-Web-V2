@@ -8,7 +8,10 @@ var passport = require('passport');
 var session = require('express-session');
 var mongoose = require('mongoose');
 
-mongoose.connect('mongodb://localhost:27017/chirp-test');
+var mongooseConnect = 'mongodb://localhost:27017/chirp-test';
+console.log('[app.js] Opening Mongoose connection to: \'' + mongooseConnect + '\'');
+mongoose.connect(mongooseConnect);
+
 
 var api = require('./routes/api');
 var auth = require('./routes/auth')(passport);

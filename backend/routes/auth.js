@@ -3,6 +3,7 @@ var router = express.Router();
 
 module.exports = function (passport) {
     router.get('/success', function (req, res) {
+        console.log('[auth.js] GET /success');
         res.send({
             state: 'success',
             user: req.user ? req.user : null
@@ -10,6 +11,7 @@ module.exports = function (passport) {
     });
 
     router.get('/failure', function (req, res) {
+        console.log('[auth.js] GET /failure');
         res.send({
             state: 'failure',
             user: null,
