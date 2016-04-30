@@ -8,11 +8,14 @@ var passport = require('passport');
 var session = require('express-session');
 var mongoose = require('mongoose');
 
-var mongooseConnect = 'mongodb://localhost:27017/chirp-test';
-console.log('[app.js] Opening Mongoose connection to: \'' + mongooseConnect + '\'');
-mongoose.connect(mongooseConnect);
+var mongoDBHost = 'mongodb://localhost:27017/chirp-test';
+console.log('[app.js] Opening Mongoose connection to: \'' + mongoDBHost + '\'');
+mongoose.connect(mongoDBHost);
 
+console.log('[app.js] Importing Mongoose Model schemas...');
+var models = require('./models/models');
 
+console.log('[app.js] Importing custom Express routers...');
 var api = require('./routes/api');
 var auth = require('./routes/auth')(passport);
 
@@ -37,16 +40,16 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(passport.initialize());
 app.use(passport.session());
 
-var models = require('./models/models');
-
+console.log('[app.js] Initializing Passport.js configuration module...');
 var initializePassport = require('./passport');
 initializePassport(passport);
 
+console.log('[app.js] Configuring routing...');
 app.use('/api', api);
 app.use('/auth', auth);
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   var err = new Error('Not Found');
   err.status = 404;
   next(err);
@@ -57,7 +60,7 @@ app.use(function(req, res, next) {
 // development error handler
 // will print stacktrace
 if (app.get('env') === 'development') {
-  app.use(function(err, req, res, next) {
+  app.use(function (err, req, res, next) {
     res.status(err.status || 500);
     res.render('error', {
       message: err.message,
@@ -68,7 +71,7 @@ if (app.get('env') === 'development') {
 
 // production error handler
 // no stacktraces leaked to user
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
   res.status(err.status || 500);
   res.render('error', {
     message: err.message,

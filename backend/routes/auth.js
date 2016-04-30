@@ -30,6 +30,7 @@ module.exports = function (passport) {
     }));
     
     router.get('/signout', function(req, res) {
+        console.log('[auth.js] User \'' + req.user + '\' logging out');
         req.logout();
         res.redirect('/');
     });
