@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <div class="clearfix">
-    <form ng-show="authenticated" ng-submit="post()">
+    <div class="col-xs-12 col-sm-12 col-md-12"><form ng-show="authenticated" ng-submit="post()">
         <h4>{{currentUser.username}} says</h4>
         <textarea class="form-control" required maxlength="200" rows="3" placeholder="Say something" ng-model="newPost.text"></textarea>
         <input class="btn submit-btn pull-right" type="submit" value="Chirp!" />
-    </form>
-    <div id="post-stream">
-        <h4>Chirp Feed</h4>
+    </form></div>
+    <div class="col-xs-12 col-sm-12 col-md-12" id="post-stream">
+        <h4>Cheeps Stream</h4>
         <div class="post" ng-repeat="post in posts | orderBy:'created_time':true" ng-class-odd="'odd'" ng-class-even="'even'">
             <p>{{post.text}}</p>
-            <small>Posted by @{{post.created_by.username}}</small>
+            <small>Posted by @{{post.created_by}}</small>
             <small class="pull-right">{{post.created_time | date:"h:mm 'on' MMM d, y"}}</small>
         </div>
     </div>

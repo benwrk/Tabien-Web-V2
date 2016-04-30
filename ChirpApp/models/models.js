@@ -11,10 +11,7 @@ var userSchema = new mongoose.Schema({
 
 var postSchema = new mongoose.Schema({
     text: String,
-    created_by: {
-        type: mongoose.Schema.ObjectId,
-        ref: 'User'
-    },
+    created_by: String,
     created_time: {
         type: Date,
         default: Date.now
