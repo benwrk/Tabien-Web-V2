@@ -1,31 +1,25 @@
 {
-  "name": "co.bwsc.lab.chirp",
-  "version": "0.1.0",
+  "name": "co.bwsc.tabien.web.v2",
+  "version": "2.0.0",
   "private": true,
   "scripts": {
     "start": "node ./bin/www"
   },
   "dependencies": {
-    "angular": "~1.5.5",
-    "angular-resource": "~1.5.5",
-    "angular-route": "~1.5.5",
     "bcrypt-nodejs": "0.0.3",
     "body-parser": "~1.13.2",
-    "bootstrap": "~3.3.6",
     "cookie-parser": "~1.3.5",
     "debug": "~2.2.0",
     "ejs": "~2.3.3",
     "express": "~4.13.1",
     "express-session": "^1.13.0",
-    "jquery": "~2.2.3",
-    "mongodb": "^2.1.18",
-    "mongoose": "^4.4.14",
     "morgan": "~1.6.1",
+    "mysql": "^2.10.2",
     "passport": "^0.3.2",
     "passport-local": "^1.0.0",
     "serve-favicon": "~2.3.0"
   },
-  "engines" : {
+  "engines": {
     "node": "4.4.1"
   }
 }

@@ -1,8 +1,30 @@
 console.log('[app.js] Starting application...');
 console.log('[app.js] Current server time: ' + new Date().toString());
 
-// process.env.PORT = process.env.PORT || 80;
+process.env.PORT = process.env.PORT || 80;
 console.log('[app.js] Listening port: ' + process.env.PORT);
+
+var mysqlconfig = {
+  host: undefined,
+  port: undefined,
+  username: undefined,
+  password: undefined,
+  database: undefined,
+  connectionLimit: undefined
+};
+
+if (process.env.MYSQLHOST) {
+  mysqlconfig = {
+    host: process.env.MYSQLHOST,
+    port: process.env.MYSQLPORT,
+    username: process.env.MYSQLUSERNAME,
+    password: process.env.MYSQLPASSWORD,
+    database: process.env.MYSQLDATABASE,
+    connectionLimit: process.env.MYSQLCLIMIT
+  };
+} else {
+  require('./config/cred/mysql')(mysqlconfig);
+}
 
 // Require JS imports
 console.log('[app.js] Importing modules...');
@@ -14,21 +36,14 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var passport = require('passport');
 var session = require('express-session');
-var mongoose = require('mongoose');
 
-var mongoDBHost = process.env.MONGOSTR || 'mongodb://localhost:27017/chirp-test';
-
-console.log('[app.js] Opening Mongoose connection to: \'' + mongoDBHost + '\'');
-mongoose.connect(mongoDBHost);
-
-console.log('[app.js] Importing Mongoose Model schemas...');
-var models = require('./models/models');
+console.log('[app.js] Importing MySQL query module...');
+var query = require('./config/query')(mysqlconfig);
 
 // ExpressJS routings
 console.log('[app.js] Importing custom Express routers...');
-var api = require('./routes/api');
+var api = require('./routes/api')(query);
 var auth = require('./routes/auth')(passport);
-var index = require('./routes/index');
 
 var app = express();
 
@@ -67,7 +82,6 @@ var initializePassport = require('./config/passport');
 initializePassport(passport);
 
 console.log('[app.js] Configuring routing...');
-app.use('/', index);
 app.use('/api', api);
 app.use('/auth', auth);
 

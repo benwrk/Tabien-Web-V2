@@ -1,28 +1,26 @@
-var mongoose = require('mongoose');   
-var User = mongoose.model('User');
 var LocalStrategy   = require('passport-local').Strategy;
 var bCrypt = require('bcrypt-nodejs');
 
-module.exports = function(passport){
+module.exports = function (passport) {
 
 	// Passport needs to be able to serialize and deserialize users to support persistent login sessions
     passport.serializeUser(function (user, done) {
         console.log('[passport.js] Serializing user: ', user.username);
-        return done(null, user._id);
+        return done(null, user.id);
     });
     
     passport.deserializeUser(function (id, done) {
-        User.findById(id, function (err, user) {
-            if (err) {
-                return done(err, false);
-            }
+        // User.findById(id, function (err, user) {
+        //     if (err) {
+        //         return done(err, false);
+        //     }
 
-            if (!user) {
-                return done('User not found', false);
-            }
+        //     if (!user) {
+        //         return done('User not found', false);
+        //     }
 
-            return done(null, user);
-        });
+        //     return done(null, user);
+        // });
     });
 
 	passport.use('login', new LocalStrategy({
