@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+var allowDelete = ['vehicle', 'vehiclemodel', 'rating', 'reply'];
 
 module.exports = function (pool) {
     // router.use(function (req, res, next) {
@@ -32,8 +33,8 @@ module.exports = function (pool) {
     //     });
     // });
 
-    router.route('/profile').get(function (req, res) {
-        pool.query('SELECT * FROM profile', function (err, rows, fields) {
+    router.route('/:element').get(function (req, res) {
+        pool.query('SELECT * FROM ' + pool.escape(req.params.element), function (err, rows, fields) {
             if (!err) {
                 return res.json(rows);
             } else {
@@ -42,8 +43,32 @@ module.exports = function (pool) {
         });
     });
 
-    router.route('/profile/:userid').get(function (req, res) {
-        pool.query('SELECT * FROM profile WHERE user_id = ' + pool.escape(req.params.userid), function (err, rows, fields) {
+    router.route('/:element/:id').get(function (req, res) {
+        pool.query('SELECT * FROM ' + pool.escape(req.params.element) + ' WHERE ' + pool.escape(req.params.element) + '_id = ' + pool.escape(req.params.id), function (err, rows, fields) {
+            if (!err) {
+                return res.json(rows);
+            } else {
+                return res.send(err);
+            }
+        });
+    }).delete(function (req, res) {
+        if (allowDelete[req.params.element]) {
+            pool.query('DELETE FROM ' + pool.escape(req.params.element) + ' WHERE ' + pool.escape(req.params.element) + '_id = ' + pool.escape(req.params.id), function (err, result) {
+                if (!err) {
+                    return res.json(rows);
+                } else {
+                    return res.send(err);
+                }
+            });
+        } else {
+            return res.status(403).send({
+                message: 'Method now allowed!'
+            });
+        }    
+    });
+
+    router.route('/user/:userid').get(function (req, res) {
+        pool.query('SELECT * FROM user WHERE user_id = ' + pool.escape(req.params.userid), function (err, rows, fields) {
             if (!err) {
                 return res.json(rows);
             } else {
@@ -52,15 +77,17 @@ module.exports = function (pool) {
         });
     });
 
-    router.route('/vehicle').get(function (req, res) {
-        pool.query('SELECT * FROM vehicle', function (err, rows, fields) {
+    router.route('/user/:userid/:property').get(function (req, res) {
+        pool.query('SELECT * FROM ' + pool.escape(req.params.property) + ' WHERE user_id = ' + pool.escape(req.params.userid), function (err, rows, fields) {
             if (!err) {
                 return res.json(rows);
             } else {
                 return res.send(err);
             }
         });
-    }).post(function (req, res) {
+    });
+
+    router.route('/vehicle').post(function (req, res) {
         var newVehicle = {
             vehiclemodel_id: req.body.vehiclemodel_id,
             user_id: req.body.user_id,
@@ -79,16 +106,17 @@ module.exports = function (pool) {
         });
     });
 
-    router.route('/vehicle/:vehicleid').get(function (req, res) {
-        pool.query('SELECT * FROM vehicle WHERE vehicle_id = ' + pool.escape(req.params.vehicleid), function (err, result) {
-            if (!err) {
-                return res.json(result.rows);
-            } else {
-                return res.send(err);
-            }
-        });
-    }).delete(function (req, res) {
-         pool.query('DELETE FROM vehicle WHERE vehicle_id = ' + pool.escape(req.params.vehicleid), function (err, result) {
+
+    router.route('/rating').post(function (req, res) {
+        var newRating = {
+            vehicle_id: req.body.vehicle_id,
+            user_id: req.body.user_id,
+            rate: req.body.rate,
+            message: req.body.message,
+            timestamp: Date.now()
+        };
+        console.log(newVehicle);
+        pool.query('INSERT INTO rating SET ?', newRating, function (err, result) {
             if (!err) {
                 return res.send(result);
             } else {
@@ -97,6 +125,37 @@ module.exports = function (pool) {
         });
     });
 
-    
+    router.route('/vehiclemodel').post(function (req, res) {
+        var newVehicleModel = {
+            brand: req.body.brand,
+            make: req.body.make
+        };
+        console.log(newVehicle);
+        pool.query('INSERT INTO vehiclemodel SET ?', newVehicleModel, function (err, result) {
+            if (!err) {
+                return res.send(result);
+            } else {
+                return res.send(err);
+            }
+        });
+    });
+
+    router.route('/reply').post(function (req, res) {
+        var newReply = {
+            user_id: req.body.user_id,
+            rating_id: req.body.rating_id,
+            message: req.body.message,
+            timestamp: Date.now()
+        };
+        console.log(newReply);
+        pool.query('INSERT INTO reply SET ?', newReply, function (err, result) {
+            if (!err) {
+                return res.send(result);
+            } else {
+                return res.send(err);
+            }
+        });
+    });
+
     return router;
 };
