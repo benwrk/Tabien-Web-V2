@@ -38,11 +38,11 @@ var passport = require('passport');
 var session = require('express-session');
 
 console.log('[app.js] Importing MySQL query module...');
-var query = require('./config/query')(mysqlconfig);
+var sqlPool = require('./config/mysqlpool')(mysqlconfig);
 
 // ExpressJS routings
 console.log('[app.js] Importing custom Express routers...');
-var api = require('./routes/api')(query);
+var api = require('./routes/api')(sqlPool);
 var auth = require('./routes/auth')(passport);
 
 var app = express();

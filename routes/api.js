@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 
-module.exports = function (query) {
+module.exports = function (pool) {
     // router.use(function (req, res, next) {
     //     console.log('[api.js] Verifying authentication for connection from: ' + req.ip);
     //     res.setHeader('cache-control', 'max-age=0');
@@ -21,7 +21,7 @@ module.exports = function (query) {
 
     router.route('/query').post(function (req, res) {
         console.log('[api.js] Querying...');
-        query('SELECT * FROM user;', function (err, result) {
+        pool('SELECT * FROM user;', function (err, result) {
             if (!err) {
                 console.log('[api.js] Query result: ');
                 console.log(result);
@@ -33,9 +33,9 @@ module.exports = function (query) {
     });
 
     router.route('/profile').get(function (req, res) {
-        query('SELECT * FROM profile', function (err, result) {
+        pool.query('SELECT * FROM profile', function (err, rows, fields) {
             if (!err) {
-                return res.json(result.rows);
+                return res.json(rows);
             } else {
                 return res.send(err);
             }
@@ -43,9 +43,9 @@ module.exports = function (query) {
     });
 
     router.route('/profile/:userid').get(function (req, res) {
-        query('SELECT * FROM profile WHERE user_id = ' + query.escape(req.params.userid), function (err, result) {
+        pool.query('SELECT * FROM profile WHERE user_id = ' + pool.escape(req.params.userid), function (err, rows, fields) {
             if (!err) {
-                return res.json(result.rows);
+                return res.json(rows);
             } else {
                 return res.send(err);
             }
@@ -53,17 +53,29 @@ module.exports = function (query) {
     });
 
     router.route('/vehicle').get(function (req, res) {
-        query('SELECT * FROM vehicle', function (err, result) {
+        pool.query('SELECT * FROM vehicle', function (err, rows, fields) {
             if (!err) {
-                return res.json(result.rows);
+                return res.json(rows);
             } else {
                 return res.send(err);
             }
         });
+    }).post(function (req, res) {
+        var newVehicle = {
+            vehicle_id: pool.escape(req.body.vehicle_id),
+            vehiclemodel_id: pool.escape(req.body.vehiclemodel_id),
+            user_id: pool.escape(req.body.user_id),
+            province_id: pool.escape(req.body.province_id),
+            first_block: pool.escape(req.body.first_block),
+            color: pool.escape(req.body.color)
+        };
+        pool.query('INSERT INTO vehicle SET ?', newVehicle, function (err, result) {
+            res.send(result);
+        });
     });
 
     router.route('/vehicle/:vehicleid').get(function (req, res) {
-        query('SELECT * FROM vehicle WHERE vehicle_id = ' + query.escape(req.params.vehicleid), function (err, result) {
+        pool('SELECT * FROM vehicle WHERE vehicle_id = ' + pool.escape(req.params.vehicleid), function (err, result) {
             if (!err) {
                 return res.json(result.rows);
             } else {
