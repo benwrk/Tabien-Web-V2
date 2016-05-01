@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
-var allowDelete = ['vehicle', 'vehiclemodel', 'rating', 'reply'];
+var deleteAllowed = { 'vehicle': true, 'vehiclemodel': true, 'rating': true, 'reply': true };
+var allowed = { 'vehicle': true, 'vehiclemodel': true, 'rating': true, 'reply': true, 'province': true, 'profile': true, 'user': true };
 
 module.exports = function (pool) {
     // router.use(function (req, res, next) {
@@ -34,26 +35,10 @@ module.exports = function (pool) {
     // });
 
     router.route('/:element').get(function (req, res) {
-        pool.query('SELECT * FROM ' + pool.escape(req.params.element), function (err, rows, fields) {
-            if (!err) {
-                return res.json(rows);
-            } else {
-                return res.send(err);
-            }
-        });
-    });
-
-    router.route('/:element/:id').get(function (req, res) {
-        pool.query('SELECT * FROM ' + pool.escape(req.params.element) + ' WHERE ' + pool.escape(req.params.element) + '_id = ' + pool.escape(req.params.id), function (err, rows, fields) {
-            if (!err) {
-                return res.json(rows);
-            } else {
-                return res.send(err);
-            }
-        });
-    }).delete(function (req, res) {
-        if (allowDelete[req.params.element]) {
-            pool.query('DELETE FROM ' + pool.escape(req.params.element) + ' WHERE ' + pool.escape(req.params.element) + '_id = ' + pool.escape(req.params.id), function (err, result) {
+        if (allowed[req.params.element]) {
+            var query = 'SELECT * FROM ' + req.params.element;
+            console.log('[api.js] Querying: ' + query);
+            pool.query(query, function (err, rows, fields) {
                 if (!err) {
                     return res.json(rows);
                 } else {
@@ -61,10 +46,49 @@ module.exports = function (pool) {
                 }
             });
         } else {
-            return res.status(403).send({
-                message: 'Method now allowed!'
+            return res.status(404).send({
+                message: 'Not found'
             });
-        }    
+        }
+    });
+
+    router.route('/:element/:id').get(function (req, res) {
+        if (allowed[req.params.element]) {
+            var query = 'SELECT * FROM ' + req.params.element + ' WHERE ' + req.params.element + '_id = ' + pool.escape(req.params.id);
+            console.log('[api.js] Querying: ' + query);
+            pool.query(query, function (err, rows, fields) {
+                if (!err) {
+                    return res.json(rows);
+                } else {
+                    return res.send(err);
+                }
+            });
+        } else {
+            return res.status(404).send({
+                message: 'Not found'
+            });
+        }
+    }).delete(function (req, res) {
+        if (deleteAllowed[req.params.element]) {
+            pool.query('DELETE FROM ' + req.params.element + ' WHERE ' + req.params.element + '_id = ' + pool.escape(req.params.id), function (err, result) {
+                if (!err) {
+                    return res.json(rows);
+                } else {
+                    return res.send(err);
+                }
+            });
+        } else {
+            if (allowed[req.params.element]) {
+                return res.status(403).send({
+                    message: 'Method now allowed!'
+                });
+            } else {
+                return res.status(404).send({
+                    message: 'Not found'
+                });
+            }
+
+        }
     });
 
     router.route('/user/:userid').get(function (req, res) {
@@ -77,14 +101,20 @@ module.exports = function (pool) {
         });
     });
 
-    router.route('/user/:userid/:property').get(function (req, res) {
-        pool.query('SELECT * FROM ' + pool.escape(req.params.property) + ' WHERE user_id = ' + pool.escape(req.params.userid), function (err, rows, fields) {
-            if (!err) {
-                return res.json(rows);
-            } else {
-                return res.send(err);
-            }
-        });
+    router.route('/user/:userid/:element').get(function (req, res) {
+        if (allowed[req.params.element]) {
+            pool.query('SELECT * FROM ' + req.params.element + ' WHERE user_id = ' + pool.escape(req.params.userid), function (err, rows, fields) {
+                if (!err) {
+                    return res.json(rows);
+                } else {
+                    return res.send(err);
+                }
+            });
+        } else {
+            return res.status(404).send({
+                message: 'Not found'
+            });
+        }
     });
 
     router.route('/vehicle').post(function (req, res) {

@@ -43,7 +43,7 @@ var sqlPool = require('./config/mysqlpool')(mysqlconfig);
 // ExpressJS routings
 console.log('[app.js] Importing custom Express routers...');
 var api = require('./routes/api')(sqlPool);
-var auth = require('./routes/auth')(passport);
+var auth = require('./routes/auth')(passport, sqlPool);
 
 var app = express();
 
@@ -79,7 +79,7 @@ app.use('/node_modules/bootstrap/dist/css/dist/css/', express.static(path.join(_
 
 console.log('[app.js] Importing Passport.js configuration module...');
 var initializePassport = require('./config/passport');
-initializePassport(passport);
+initializePassport(passport, sqlPool);
 
 console.log('[app.js] Configuring routing...');
 app.use('/api', api);
