@@ -1,7 +1,7 @@
 console.log('[app.js] Starting application...');
 console.log('[app.js] Current server time: ' + new Date().toString());
 
-process.env.PORT = process.env.PORT || 80;
+// process.env.PORT = process.env.PORT || 80;
 console.log('[app.js] Listening port: ' + process.env.PORT);
 
 // Require JS imports
@@ -15,7 +15,6 @@ var bodyParser = require('body-parser');
 var passport = require('passport');
 var session = require('express-session');
 var mongoose = require('mongoose');
-
 
 var mongoDBHost = process.env.MONGOSTR || 'mongodb://localhost:27017/chirp-test';
 
