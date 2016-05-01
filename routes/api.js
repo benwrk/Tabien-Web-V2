@@ -19,18 +19,18 @@ module.exports = function (pool) {
     //     return next();
     // });
 
-    router.route('/query').post(function (req, res) {
-        console.log('[api.js] Querying...');
-        pool('SELECT * FROM user;', function (err, result) {
-            if (!err) {
-                console.log('[api.js] Query result: ');
-                console.log(result);
-                return res.json(result);
-            } else {
-                return res.send(err);
-            }
-        });
-    });
+    // router.route('/query').post(function (req, res) {
+    //     console.log('[api.js] Querying...');
+    //     pool.query('SELECT * FROM user;', function (err, result) {
+    //         if (!err) {
+    //             console.log('[api.js] Query result: ');
+    //             console.log(result);
+    //             return res.json(result);
+    //         } else {
+    //             return res.send(err);
+    //         }
+    //     });
+    // });
 
     router.route('/profile').get(function (req, res) {
         pool.query('SELECT * FROM profile', function (err, rows, fields) {
@@ -62,34 +62,41 @@ module.exports = function (pool) {
         });
     }).post(function (req, res) {
         var newVehicle = {
-            vehicle_id: pool.escape(req.body.vehicle_id),
-            vehiclemodel_id: pool.escape(req.body.vehiclemodel_id),
-            user_id: pool.escape(req.body.user_id),
-            province_id: pool.escape(req.body.province_id),
-            first_block: pool.escape(req.body.first_block),
-            color: pool.escape(req.body.color)
+            vehiclemodel_id: req.body.vehiclemodel_id,
+            user_id: req.body.user_id,
+            province_id: req.body.province_id,
+            first_block: req.body.first_block,
+            second_block: req.body.second_block,
+            color: req.body.color
         };
+        console.log(newVehicle);
         pool.query('INSERT INTO vehicle SET ?', newVehicle, function (err, result) {
-            res.send(result);
-        });
-    });
-
-    router.route('/vehicle/:vehicleid').get(function (req, res) {
-        pool('SELECT * FROM vehicle WHERE vehicle_id = ' + pool.escape(req.params.vehicleid), function (err, result) {
             if (!err) {
-                return res.json(result.rows);
+                return res.send(result);
             } else {
                 return res.send(err);
             }
         });
     });
 
-    router.route('/posts/:id').get(function (req, res) {
-
-    }).put(function (req, res) {
-
+    router.route('/vehicle/:vehicleid').get(function (req, res) {
+        pool.query('SELECT * FROM vehicle WHERE vehicle_id = ' + pool.escape(req.params.vehicleid), function (err, result) {
+            if (!err) {
+                return res.json(result.rows);
+            } else {
+                return res.send(err);
+            }
+        });
     }).delete(function (req, res) {
-
+         pool.query('DELETE FROM vehicle WHERE vehicle_id = ' + pool.escape(req.params.vehicleid), function (err, result) {
+            if (!err) {
+                return res.send(result);
+            } else {
+                return res.send(err);
+            }
+        });
     });
+
+    
     return router;
 };

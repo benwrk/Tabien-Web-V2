@@ -15,7 +15,7 @@ module.exports = function (passport) {
         res.send({
             state: 'failure',
             user: null,
-            message: 'Invalid username or password'
+            message: 'Authentication failure'
         });
     });
 
