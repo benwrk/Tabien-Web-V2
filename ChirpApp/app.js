@@ -16,7 +16,9 @@ var passport = require('passport');
 var session = require('express-session');
 var mongoose = require('mongoose');
 
-var mongoDBHost = 'mongodb://localhost:27017/chirp-test';
+
+var mongoDBHost = process.env.MONGOSTR || 'mongodb://localhost:27017/chirp-test';
+
 console.log('[app.js] Opening Mongoose connection to: \'' + mongoDBHost + '\'');
 mongoose.connect(mongoDBHost);
 
