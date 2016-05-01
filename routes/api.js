@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-var deleteAllowed = { 'vehicle': true, 'vehiclemodel': true, 'rating': true, 'reply': true };
+var deleteAllowed = { 'vehicle': true, 'vehiclemodel': true, 'rating': true, 'reply': true, 'user': true };
 var allowed = { 'vehicle': true, 'vehiclemodel': true, 'rating': true, 'reply': true, 'province': true, 'profile': true, 'user': true };
 
 module.exports = function (pool) {
@@ -70,9 +70,11 @@ module.exports = function (pool) {
         }
     }).delete(function (req, res) {
         if (deleteAllowed[req.params.element]) {
-            pool.query('DELETE FROM ' + req.params.element + ' WHERE ' + req.params.element + '_id = ' + pool.escape(req.params.id), function (err, result) {
+            var query = 'DELETE FROM ' + req.params.element + ' WHERE ' + req.params.element + '_id = ' + pool.escape(req.params.id);
+            console.log('[api.js] Querying: ' + query);
+            pool.query(query, function (err, result) {
                 if (!err) {
-                    return res.json(rows);
+                    return res.json(result);
                 } else {
                     return res.send(err);
                 }
@@ -92,7 +94,9 @@ module.exports = function (pool) {
     });
 
     router.route('/user/:userid').get(function (req, res) {
-        pool.query('SELECT * FROM user WHERE user_id = ' + pool.escape(req.params.userid), function (err, rows, fields) {
+        var query = 'SELECT * FROM user WHERE user_id = ' + pool.escape(req.params.userid);
+        console.log('[api.js] Querying: ' + query);
+        pool.query(query, function (err, rows, fields) {
             if (!err) {
                 return res.json(rows);
             } else {
@@ -101,9 +105,29 @@ module.exports = function (pool) {
         });
     });
 
+    router.route('/:elementroot/:id/:element').get(function (req, res) {
+        if (allowed[req.params.elementroot] && allowed[req.params.element]) {
+            var query = 'SELECT * FROM ' + req.params.element + ' WHERE '+ req.params.elementroot + '_id = ' + pool.escape(req.params.id);
+            console.log('[api.js] Querying: ' + query);
+            pool.query(query, function (err, rows, fields) {
+                if (!err) {
+                    return res.json(rows);
+                } else {
+                    return res.send(err);
+                }
+            });
+        } else {
+            return res.status(404).send({
+                message: 'Not found'
+            });
+        }
+    });
+
     router.route('/user/:userid/:element').get(function (req, res) {
         if (allowed[req.params.element]) {
-            pool.query('SELECT * FROM ' + req.params.element + ' WHERE user_id = ' + pool.escape(req.params.userid), function (err, rows, fields) {
+            var query = 'SELECT * FROM ' + req.params.element + ' WHERE user_id = ' + pool.escape(req.params.userid);
+            console.log('[api.js] Querying: ' + query);
+            pool.query(query, function (err, rows, fields) {
                 if (!err) {
                     return res.json(rows);
                 } else {
@@ -126,8 +150,66 @@ module.exports = function (pool) {
             second_block: req.body.second_block,
             color: req.body.color
         };
-        console.log(newVehicle);
-        pool.query('INSERT INTO vehicle SET ?', newVehicle, function (err, result) {
+        var query = 'INSERT INTO vehicle SET ?';
+        console.log('[api.js] Querying: ' + query);
+        pool.query(query, newVehicle, function (err, result) {
+            if (!err) {
+                return res.send(result);
+            } else {
+                return res.send(err);
+            }
+        });
+    });
+
+    router.route('/vehicle/:vehicleid').put(function (req, res) {
+        var newVehicle = {
+            vehiclemodel_id: req.body.vehiclemodel_id,
+            user_id: req.body.user_id,
+            province_id: req.body.province_id,
+            first_block: req.body.first_block,
+            second_block: req.body.second_block,
+            color: req.body.color
+        };
+        var query = 'UPDATE vehicle SET ? WHERE vehicle_id = ' + pool.escape(req.params.vehicleid);
+        console.log('[api.js] Querying: ' + query);
+        pool.query(query, newVehicle, function (err, result) {
+            if (!err) {
+                return res.send(result);
+            } else {
+                return res.send(err);
+            }
+        });
+    });
+
+    router.route('/rating/:ratingid').put(function (req, res) {
+        var newRating = {
+            vehicle_id: req.body.vehicle_id,
+            user_id: req.body.user_id,
+            rate: req.body.rate,
+            message: req.body.message,
+            timestamp: Date.now()
+        };
+        var query = 'UPDATE rating SET ? WHERE rating_id = ' + pool.escape(req.params.ratingid);
+        console.log('[api.js] Querying: ' + query);
+        pool.query(query, newRating, function (err, result) {
+            if (!err) {
+                return res.send(result);
+            } else {
+                return res.send(err);
+            }
+        });
+    });
+
+    router.route('/reply/:replyid').put(function (req, res) {
+        var newReply = {
+            user_id: req.body.user_id,
+            rating_id: req.body.rating_id,
+            message: req.body.message,
+            timestamp: Date.now()
+        };
+        var query = 'UPDATE reply SET ? WHERE reply_id = ' + pool.escape(req.params.replyid);
+        console.log('[api.js] Querying: ' + query);
+        pool.query(query, newReply, function (err, result) {
             if (!err) {
                 return res.send(result);
             } else {
@@ -145,7 +227,6 @@ module.exports = function (pool) {
             message: req.body.message,
             timestamp: Date.now()
         };
-        console.log(newVehicle);
         pool.query('INSERT INTO rating SET ?', newRating, function (err, result) {
             if (!err) {
                 return res.send(result);
@@ -160,7 +241,6 @@ module.exports = function (pool) {
             brand: req.body.brand,
             make: req.body.make
         };
-        console.log(newVehicle);
         pool.query('INSERT INTO vehiclemodel SET ?', newVehicleModel, function (err, result) {
             if (!err) {
                 return res.send(result);
@@ -177,7 +257,6 @@ module.exports = function (pool) {
             message: req.body.message,
             timestamp: Date.now()
         };
-        console.log(newReply);
         pool.query('INSERT INTO reply SET ?', newReply, function (err, result) {
             if (!err) {
                 return res.send(result);

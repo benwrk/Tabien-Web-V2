@@ -1,6 +1,6 @@
 "use_strict";
 
-var app = angular.module('chirpApp', ['ngRoute', 'ngResource']).run(function ($rootScope, $http, $location) {
+var app = angular.module('tabien-app', ['ngRoute', 'ngResource']).run(function ($rootScope, $http, $location) {
     $rootScope.authenticated = false;
     $rootScope.currentUser = undefined;
     $rootScope.signout = function () {
