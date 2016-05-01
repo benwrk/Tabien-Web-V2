@@ -124,6 +124,7 @@ module.exports = function (passport, pool) {
                     if (err) {
                         return done(err, false);
                     }
+                    console.log(result);
                     pool.query('SELECT * FROM user WHERE username =' + pool.escape(username), function (err, rows, fields) {
                         if (err) {
                             return done(err, false);
@@ -142,8 +143,12 @@ module.exports = function (passport, pool) {
                             user_id: user.user_id
                         };
                         pool.query('INSERT INTO profile SET ?', newProfile, function (err, result) {
-                            console.log('[passport.js] Successfully signed up: ' + username);
-                            return done(null, user);
+                            if (err) {
+                                return done(err, false);
+                            } else {
+                                console.log('[passport.js] Successfully signed up: ' + username);
+                                return done(null, user);
+                            }
                         });
                     });
                 });
