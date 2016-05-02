@@ -125,6 +125,22 @@ module.exports = function (passport, pool) {
                 password: createHash(password)
             };
 
+            var newProfile = {
+                firstname: req.body.firstname,
+                lastname: req.body.lastname,
+                location: req.body.location,
+                email: req.body.email,
+                user_id: undefined
+            };
+
+            console.log(newUser);
+            console.log(newProfile);
+
+            if (!(newProfile.firstname && newProfile.lastname && newProfile.location && newProfile.email)) {
+                console.log('[passport.js] Error: cannot find required user profile arguments.');
+                return done('Unidentified object exist in user profile', false);
+            }
+
             pool.query('INSERT INTO user SET ?', newUser, function (err, result) {
                 if (err) {
                     console.log('[passport.js] Error querying (1)');
@@ -143,18 +159,9 @@ module.exports = function (passport, pool) {
                         console.log('[passport.js] Error: User does not exist after registration error.');
                         return done('unknown error', false);
                     }
-                    var newProfile = {
-                        firstname: req.body.profile.firstname,
-                        lastname: req.body.profile.lastname,
-                        location: req.body.profile.location,
-                        email: req.body.profile.email,
-                        user_id: user.user_id
-                    };
 
-                    if (!(newProfile.firstname && newProfile.lastname && newProfile.location && newProfile.email && newProfile.user_id)) {
-                        console.log('[passport.js] Error: cannot find required user profile arguments.');
-                        return done('Unidentified object exist in user profile', false);
-                    }
+                    newProfile.user_id = user.user_id;
+
                     pool.query('INSERT INTO profile SET ?', newProfile, function (err, result) {
                         if (err) {
                             console.log('[passport.js] Error querying (3)');
