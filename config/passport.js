@@ -104,6 +104,7 @@ module.exports = function (passport, pool) {
             // });
             pool.query('SELECT * FROM user WHERE username = ' + pool.escape(username), function (err, rows, fields) {
                 if (err) {
+                    console.log('Error querying (0)');
                     return done(err, false);
                 }
 
@@ -121,17 +122,20 @@ module.exports = function (passport, pool) {
 
                 pool.query('INSERT INTO user SET ?', newUser, function (err, result) {
                     if (err) {
+                        console.log('Error querying (1)');
                         return done(err, false);
                     }
-                    console.log(result);
+                    // console.log(result);
                     pool.query('SELECT * FROM user WHERE username =' + pool.escape(username), function (err, rows, fields) {
                         if (err) {
+                            console.log('Error querying (2)');
                             return done(err, false);
                         }
 
                         var user = rows[0];
 
                         if (!user) {
+                            console.log('User does not exist after registration error.');
                             return done('unknown error', false);
                         }
                         var newProfile = {
@@ -143,6 +147,7 @@ module.exports = function (passport, pool) {
                         };
                         pool.query('INSERT INTO profile SET ?', newProfile, function (err, result) {
                             if (err) {
+                                console.log('Error querying (3)');
                                 return done(err, false);
                             } else {
                                 console.log('[passport.js] Successfully signed up: ' + username);

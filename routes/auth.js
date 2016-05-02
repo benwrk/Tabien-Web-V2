@@ -5,7 +5,7 @@ module.exports = function (passport) {
     router.get('/success', function (req, res) {
         console.log('[auth.js] GET /success');
         res.setHeader('Access-Control-Allow-Origin', '*');
-        res.send({
+        res.json({
             state: 'success',
             user: req.user ? req.user : null
         });
@@ -13,7 +13,7 @@ module.exports = function (passport) {
 
     router.get('/failure', function (req, res) {
         console.log('[auth.js] GET /failure');
-        res.send({
+        res.json({
             state: 'failure',
             user: null,
             message: 'Authentication failure'
