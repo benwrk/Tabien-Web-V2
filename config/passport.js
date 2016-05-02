@@ -176,7 +176,8 @@ module.exports = function (passport, pool) {
                             return done(err, false);
                         } else {
                             console.log('[passport.js] Successfully signed up: ' + username);
-                            return done(null, user);
+                            newUser.user_id = user.user_id;
+                            return done(null, newUser);
                         }
                     });
                 });

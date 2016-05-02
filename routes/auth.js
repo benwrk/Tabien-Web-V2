@@ -4,19 +4,25 @@ var router = express.Router();
 module.exports = function (passport) {
     router.get('/success', function (req, res) {
         console.log('[auth.js] GET /success');
-        res.send({
+        var ans = {
             state: 'success',
             user: req.user ? req.user : null
-        });
+        };
+        console.log('[auth.js] Response:');
+        console.log(ans);
+        res.json(ans);
     });
 
     router.get('/failure', function (req, res) {
         console.log('[auth.js] GET /failure');
-        res.send({
+        var ans = {
             state: 'failure',
             user: null,
-            message: 'Authentication failure'
-        });
+            message: 'Authenticaltion failure'
+        }
+        console.log('[auth.js] Response:');
+        console.log(ans);
+        res.json(ans);
     });
 
     router.post('/login', passport.authenticate('login', {
