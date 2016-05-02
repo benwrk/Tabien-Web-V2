@@ -93,21 +93,21 @@ module.exports = function (pool) {
         }
     });
 
-    router.route('/user/:userid').get(function (req, res) {
-        var query = 'SELECT * FROM user WHERE user_id = ' + pool.escape(req.params.userid);
-        console.log('[api.js] Querying: ' + query);
-        pool.query(query, function (err, rows, fields) {
-            if (!err) {
-                return res.json(rows);
-            } else {
-                return res.send(err);
-            }
-        });
-    });
+    // router.route('/user/:userid').get(function (req, res) {
+    //     var query = 'SELECT * FROM user WHERE user_id = ' + pool.escape(req.params.userid);
+    //     console.log('[api.js] Querying: ' + query);
+    //     pool.query(query, function (err, rows, fields) {
+    //         if (!err) {
+    //             return res.json(rows);
+    //         } else {
+    //             return res.send(err);
+    //         }
+    //     });
+    // });
 
     router.route('/:elementroot/:id/:element').get(function (req, res) {
         if (allowed[req.params.elementroot] && allowed[req.params.element]) {
-            var query = 'SELECT * FROM ' + req.params.element + ' WHERE '+ req.params.elementroot + '_id = ' + pool.escape(req.params.id);
+            var query = 'SELECT * FROM ' + req.params.element + ' WHERE ' + req.params.elementroot + '_id = ' + pool.escape(req.params.id);
             console.log('[api.js] Querying: ' + query);
             pool.query(query, function (err, rows, fields) {
                 if (!err) {
@@ -123,23 +123,23 @@ module.exports = function (pool) {
         }
     });
 
-    router.route('/user/:userid/:element').get(function (req, res) {
-        if (allowed[req.params.element]) {
-            var query = 'SELECT * FROM ' + req.params.element + ' WHERE user_id = ' + pool.escape(req.params.userid);
-            console.log('[api.js] Querying: ' + query);
-            pool.query(query, function (err, rows, fields) {
-                if (!err) {
-                    return res.json(rows);
-                } else {
-                    return res.send(err);
-                }
-            });
-        } else {
-            return res.status(404).send({
-                message: 'Not found'
-            });
-        }
-    });
+    // router.route('/user/:userid/:element').get(function (req, res) {
+    //     if (allowed[req.params.element]) {
+    //         var query = 'SELECT * FROM ' + req.params.element + ' WHERE user_id = ' + pool.escape(req.params.userid);
+    //         console.log('[api.js] Querying: ' + query);
+    //         pool.query(query, function (err, rows, fields) {
+    //             if (!err) {
+    //                 return res.json(rows);
+    //             } else {
+    //                 return res.send(err);
+    //             }
+    //         });
+    //     } else {
+    //         return res.status(404).send({
+    //             message: 'Not found'
+    //         });
+    //     }
+    // });
 
     router.route('/vehicle').post(function (req, res) {
         var newVehicle = {
@@ -210,6 +210,25 @@ module.exports = function (pool) {
         var query = 'UPDATE reply SET ? WHERE reply_id = ' + pool.escape(req.params.replyid);
         console.log('[api.js] Querying: ' + query);
         pool.query(query, newReply, function (err, result) {
+            if (!err) {
+                return res.send(result);
+            } else {
+                return res.send(err);
+            }
+        });
+    });
+
+    router.route('/profile/:profileid').put(function (req, res) {
+        var newProfile = {
+            firstname: req.body.firstname,
+            lastname: req.body.lastname,
+            location: req.body.location,
+            email: req.body.email,
+            user_id: req.body.user_id
+        };
+        var query = 'UPDATE profile SET ? WHERE profile_id = ' + pool.escape(req.params.profileid);
+        console.log('[api.js] Querying: ' + query);
+        pool.query(query, newProfile, function (err, result) {
             if (!err) {
                 return res.send(result);
             } else {

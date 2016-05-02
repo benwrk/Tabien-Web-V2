@@ -70,6 +70,10 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(function (req, res, next) {
+  console.log(req.body);
+  return next();
+});
 
 // Make node_modules accessible to the public.
 

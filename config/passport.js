@@ -89,7 +89,6 @@ module.exports = function (passport, pool) {
             //     console.log('[passport.js] Attempt to signup \'' + username + '\' failed: Username already exists.');
             //     return done('username already exists', false);
             // }
-
             // // Add user to database
             // var newUser = new User();
             // newUser.username = username;

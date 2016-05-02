@@ -4,8 +4,6 @@
 <head>
     <meta charset="UTF-8">
     <title>Tabien</title>
-    <script src="/node_modules/jquery/dist/jquery.js"></script>
-    <script src="/node_modules/bootstrap/dist/js/bootstrap.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-route.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-resource.min.js"></script>
@@ -17,8 +15,7 @@
 <body ng-app="tabien-app">
     <nav class="navbar-fluid navbar-default navbar-fixed-top">
         <div class="container">
-            <a href="#" class="navbar-brand">Chirp!</a>
-            <p class="navbar-text">MEAN Stack Testing</p>
+            <a href="#" class="navbar-brand">Tabien</a>
             <p class="navbar-right navbar-text" ng-hide="authenticated"><a href="#/login">Login</a> or <a href="#/signup">Sign Up</a></p>
             <p class="navbar-right navbar-text" ng-show="authenticated"><a href="#" ng-click="signout()">Sign Out</a></p>
             <p class="navbar-right navbar-text" ng-show="authenticated">Signed in as {{currentUser.username}}</p>
@@ -27,7 +24,6 @@
     <div class="col-md-offset-2 col-md-8">
         <div ng-view></div>
     </div>
-
 </body>
 
 </html>

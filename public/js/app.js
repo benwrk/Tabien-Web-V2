@@ -2,7 +2,8 @@
 
 var app = angular.module('tabien-app', ['ngRoute', 'ngResource']).run(function ($rootScope, $http, $location) {
     $rootScope.authenticated = false;
-    $rootScope.currentUser = undefined;
+    $rootScope.currentUser = {};
+    $rootScope.currentUserProfile = {};
     $rootScope.signout = function () {
         $http.get('/auth/signout').success(function (data) {
             console.log('Successfully signed out');
@@ -13,8 +14,8 @@ var app = angular.module('tabien-app', ['ngRoute', 'ngResource']).run(function (
 
 app.config(function ($routeProvider) {
     $routeProvider.when('/', {
-        templateUrl: 'main.html',
-        controller: 'chirpController'
+        templateUrl: 'dashboard.html',
+        controller: 'tabien-app'
     }).when('/login', {
         templateUrl: 'login.html',
         controller: 'authController'
@@ -24,17 +25,17 @@ app.config(function ($routeProvider) {
     });
 });
 
-app.factory('postFactory', function ($resource) {
-    return $resource('/api/posts/:id');
+app.factory('postService', function ($rootScope, $http) {
+    var factory = {};
+    factory.getProfile = function () {
+        return $http.get('/api/user/' + $rootScope.currentUser.user_id + '/profile');
+    };
+    return factory;
 });
 
-app.controller('chirpController', function ($scope, $rootScope, postFactory) {
-    $scope.posts = postFactory.query();
-    $scope.newPost = {
-        created_by: '',
-        text: '',
-        created_time: ''
-    };
+app.controller('tabienApp', function ($scope, $rootScope, postFactory) {
+    $scope.profile = {};
+    
 
     postFactory.query();
     // postFactory.getAll().success(function (data) {
@@ -48,7 +49,7 @@ app.controller('chirpController', function ($scope, $rootScope, postFactory) {
         $scope.newPost.created_time = Date.now();
         // console.log($scope.newPost);
         // console.log($scope.posts);
-    
+
         postFactory.save($scope.newPost, function () {
             $scope.newPost.created_by = '';
             $scope.newPost.created_time = '';
